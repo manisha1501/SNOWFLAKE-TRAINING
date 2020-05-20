@@ -1,0 +1,52 @@
+/*********CREATE WAREHOUSE*******************
+Creates a new virtual warehouse in the system
+
+SYNTAX 
+CREATE [ OR REPLACE ] WAREHOUSE [ IF NOT EXISTS ] <name>
+        [ [ WITH ] objectProperties ]
+        [ objectParams ]
+        
+ objectProperties ::=
+  WAREHOUSE_SIZE = XSMALL | SMALL | MEDIUM | LARGE | XLARGE | XXLARGE | XXXLARGE | X4LARGE
+  MAX_CLUSTER_COUNT = <num>
+  MIN_CLUSTER_COUNT = <num>
+  SCALING_POLICY = STANDARD | ECONOMY
+  AUTO_SUSPEND = <num> | NULL
+  AUTO_RESUME = TRUE | FALSE
+  INITIALLY_SUSPENDED = TRUE | FALSE
+  RESOURCE_MONITOR = <monitor_name>
+  COMMENT = '<string_literal>'
+  
+objectParams ::=
+  MAX_CONCURRENCY_LEVEL = <num>
+  STATEMENT_QUEUED_TIMEOUT_IN_SECONDS = <num>
+  STATEMENT_TIMEOUT_IN_SECONDS = <num>
+*/
+
+create or replace warehouse Dev_WH warehouse_size=small initially_suspended=true;
+
+
+
+
+
+
+/*
+*********************ALTER WAREHOUSE ***************************
+Suspends or resumes a virtual warehouse, or aborts all queries (and other SQL statements) for a warehouse. Can also be used to rename or set/unset the properties for a warehouse
+
+SYNTAX 
+ALTER WAREHOUSE [ IF EXISTS ] [ <name> ] { SUSPEND | RESUME [ IF SUSPENDED ] }
+
+ALTER WAREHOUSE [ IF EXISTS ] [ <name> ] ABORT ALL QUERIES
+
+ALTER WAREHOUSE [ IF EXISTS ] <name> RENAME TO <new_name>
+
+ALTER WAREHOUSE [ IF EXISTS ] <name> SET [ objectProperties ]
+                                         [ objectParams ]
+
+ALTER WAREHOUSE [ IF EXISTS ] <name> UNSET { <property_name> | <param_name> } [ , ... ]
+*/
+
+alter warehouse Dev_WH resume;
+alter warehouse if exists Dev_WH rename to Dev_WH_1;
+alter warehouse Dev_WH set warehouse_size=medium;
