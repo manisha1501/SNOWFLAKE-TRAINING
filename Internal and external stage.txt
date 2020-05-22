@@ -1,0 +1,15 @@
+--Internal Stage
+
+create or replace stage internal_stage
+  file_format = dev_csv_format
+  copy_options = (on_error='skip_file');
+  
+  ls @internal_stage
+  
+-- External Stage   Amazon S3
+
+create or replace stage external_stage
+  url='s3://load/files/'
+  credentials=(aws_key_id='1a2b3c' aws_secret_key='4x5y6z')
+  file_format = dev_csv_format
+  copy_options = (on_error='skip_file');

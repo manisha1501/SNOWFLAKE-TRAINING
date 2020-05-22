@@ -1,0 +1,60 @@
+Download and install snowsql:
+https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/index.html
+
+
+Open command prompt and type : snowsql
+for inital configuration and setup
+
+Login to account :
+snowsql -a fm87864.ap-south-1.aws  -u ADMIN
+-- -a is account name (everything left to snowflakecomputing.com)
+-- -u is username
+
+
+-- Change current DB to Demo_DB where internal Stage and File formats were created
+Use DB Demo_DB 
+
+
+--Check current DB an Schema 
+select current_database(), current_schema();
+
+--Create customer table 
+  create or replace table Customer (
+  id number(38,0),
+  first_name string ,
+  last_name string ,
+  email string ,
+  gender string ,
+  id_address string 
+  );
+  
+  
+---Create WH:Customer_Dev_wh
+  create or replace warehouse Customer_Dev_wh with
+  warehouse_size='X-SMALL'
+  auto_suspend = 180
+  auto_resume = true
+  initially_suspended=true;
+  
+--Check current WH
+  select current_warehouse();
+  
+
+
+-- Put command to move file from local to intrnal stage   
+for window 
+  put file://C:\Users\singhm\Desktop\personal\snowflake\Resources\sourcefiles\Customer_data*.csv @internal_stage;
+
+Linux or macOS
+
+put file:///tmp/employees0*.csv @internal_stage;
+
+-- list files in stage 
+ls @internal_stage
+
+-- Copy command to load data to table 
+
+copy into  Customer 
+  from @internal_stage
+  file_format = dev_csv_format
+  on_error = 'skip_file';
