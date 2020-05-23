@@ -1,0 +1,53 @@
+-- create new file format 
+
+  create or replace file format dev_csv_ext_format
+  type = csv
+  field_delimiter = ','
+  skip_header = 1
+  null_if = ('NULL', 'null')
+  empty_field_as_null = true
+  compression=NONE
+comment='CSV Pipe delimented ';
+
+
+ --- create external stage (AWS S3)
+  create or replace stage external_stage
+  url='s3://customer-data-aws-bucket/'
+  credentials=(aws_key_id='********' aws_secret_key='*************8')
+  file_format = dev_csv_ext_format
+  copy_options = (on_error='skip_file');
+  
+-- list stage 
+  ls @external_stage
+  
+-- Load data to Customer table from file in external stage 
+
+copy into  Customer 
+  from @external_stage
+  file_format = dev_csv_ext_format
+  on_error = 'skip_file';
+
+
+
+/* Standard data load */
+COPY INTO [<namespace>.]<table_name>
+     FROM { internalStage | externalStage | externalLocation }
+[ FILES = ( '<file_name>' [ , '<file_name>' ] [ , ... ] ) ]
+[ PATTERN = '<regex_pattern>' ]
+[ FILE_FORMAT = ( { FORMAT_NAME = '[<namespace>.]<file_format_name>' |
+                    TYPE = { CSV | JSON | AVRO | ORC | PARQUET | XML } [ formatTypeOptions ] } ) ]
+[ copyOptions ]
+[ VALIDATION_MODE = RETURN_<n>_ROWS | RETURN_ERRORS | RETURN_ALL_ERRORS ]
+
+
+
+copyOptions ::=
+     ON_ERROR = { CONTINUE | SKIP_FILE | SKIP_FILE_<num> | SKIP_FILE_<num>% | ABORT_STATEMENT }
+     SIZE_LIMIT = <num>
+     PURGE = TRUE | FALSE
+     RETURN_FAILED_ONLY = TRUE | FALSE
+     MATCH_BY_COLUMN_NAME = CASE_SENSITIVE | CASE_INSENSITIVE | NONE
+     ENFORCE_LENGTH = TRUE | FALSE
+     TRUNCATECOLUMNS = TRUE | FALSE
+     FORCE = TRUE | FALSE
+     LOAD_UNCERTAIN_FILES = TRUE | FALSE

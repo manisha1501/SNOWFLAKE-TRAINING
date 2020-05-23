@@ -1,0 +1,57 @@
+/*For the demo we will use the external stage and file format created earlier
+and load to customer table
+
+external_stage
+dev_csv_format
+Customer
+*/
+
+--copy into command : 
+
+copy into  Customer 
+  from @external_stage
+  file_format = dev_csv_ext_format
+  on_error = 'skip_file';
+  
+  
+/*  Create pipe
+  SYNTAX 
+  CREATE [ OR REPLACE ] PIPE [ IF NOT EXISTS ] <name>
+    [ AUTO_INGEST = [ TRUE | FALSE ] ]
+  [ AWS_SNS_TOPIC = <string> ]
+  [ INTEGRATION = '<string>' ]
+  [ COMMENT = '<string_literal>' ]
+  AS <copy_statement>
+  
+  */
+  
+  CREATE OR REPLACE PIPE customer_pipe 
+auto_ingest = true
+AS copy into  Customer 
+  from @external_stage
+  file_format = dev_csv_ext_format
+  on_error = 'skip_file';
+  
+  SHOW PIPES;
+  
+-- on AWS account add event notification on S3 bucket : SQS notification and map arn of the pipe  
+-- upload new file; check Pipe status before and after file upload
+
+	
+select   SYSTEM$PIPE_STATUS( 'CUSTOMER_PIPE_DEMO' )
+
+
+
+select * from table(validate_pipe_load(
+  pipe_name=>'CUSTOMER_PIPE_DEMO',
+  start_time=>dateadd(hour, -1, current_timestamp())));
+
+
+  
+  select * from customer
+  ---Truncate table customer
+  
+  
+  
+
+  

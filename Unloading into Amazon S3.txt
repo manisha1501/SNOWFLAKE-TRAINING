@@ -1,0 +1,32 @@
+Unloading Data into an External Stage
+
+-- create new file format 
+
+  create or replace file format Unload_S3_format
+  type = parquet
+  compression=snappy
+comment='parquet format ';
+
+
+ --- create external stage (AWS S3)
+  create or replace stage external_S3_stage
+  url='s3://customer-data-aws-bucket/unload'
+  credentials=(aws_key_id='*************' aws_secret_key='***************')
+  file_format = Unload_S3_format
+  copy_options = (on_error='skip_file');
+  
+  
+  -- list stage 
+  ls @external_S3_stage
+  
+-- Load data to Customer table from file in external stage 
+
+copy into @external_S3_stage/ from Customer;
+
+copy into @external_S3_stage/customer_data from Customer;
+
+
+-- list stage 
+  ls @external_S3_stage
+
+

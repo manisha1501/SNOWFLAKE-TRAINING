@@ -1,0 +1,46 @@
+GET 
+Syntax
+GET internalStage file://<path_to_file>/<filename>
+    [ PARALLEL = <integer> ]
+    [ PATTERN = '<regex_pattern>'' ]
+Where:
+
+internalStage ::=
+    @[<namespace>.]<int_stage_name>[/<path>]
+  | @[<namespace>.]%<table_name>[/<path>]
+  | @~[/<path>]
+
+
+
+SNOWSQL 
+Open command prompt and type : snowsql
+for inital configuration and setup
+
+Login to account :
+snowsql -a fm87864.ap-south-1.aws  -u ADMIN
+-- -a is account name (everything left to snowflakecomputing.com)
+-- -u is username
+
+
+-- Change current DB to Demo_DB where internal Stage and File formats were created
+Use DB Demo_DB 
+
+
+get  @internal_stage file://C:\Users\singhm\Desktop\personal\snowflake\Resources\targetfiles\ ;
+
+
+
+
+
+/*
+Use the GET command to download the generated file(s) from the table stage to your local machine. The following example downloads the files to the data/unload directory:
+
+For example:
+
+Linux or macOS:
+
+get @mystage/unload/data_0_0_0.csv.gz file:///data/unload;
+Windows:
+
+get @mystage/unload/data_0_0_0.csv.gz file://c:\data\unload;
+*/

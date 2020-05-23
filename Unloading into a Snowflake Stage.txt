@@ -1,0 +1,34 @@
+-- Create internal named stage 
+
+create or replace stage internal_stage_unload
+  file_format = dev_csv_format
+  copy_options = (on_error='skip_file');
+  
+--list stage  
+  ls @internal_stage_unload;
+ 
+--COPY INTO <LOCATION>  
+--NAMED STAGED
+
+  copy into @internal_stage_unload
+  from (select * from customer limit 50 );
+  
+  copy into @internal_stage_unload/customer_data
+  from (select * from customer limit 50 );
+  
+    ls @internal_stage_unload;
+    
+--USER STAGE    
+    ls @~;
+
+--TABLE STAGE
+    ls @%customer;
+    
+copy into @%customer/customer_data
+  from (select * from customer limit 50 );
+    
+    
+--GET to unload the file from stage to local destination   
+  get  @internal_stage_unload file://C:\Users\singhm\Desktop\personal\snowflake\Resources\targetfiles\ ;
+
+
