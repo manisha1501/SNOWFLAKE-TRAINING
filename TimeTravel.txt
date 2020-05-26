@@ -1,0 +1,73 @@
+--Time Trave Demo
+--data_retention_time_in_days
+create or replace  table Test_Time_travel(id number, name string) data_retention_time_in_days=90;
+
+alter table Test_Time_travel set data_retention_time_in_days=0;
+
+insert into Test_Time_travel
+values (1,'xxx'),
+(2,'zxy'),
+(3,'abc'),
+(4,'efg'),
+(5,'hij')
+
+
+ALTER SESSION SET TIMEZONE = 'UTC';
+
+
+select current_timestamp()
+
+select * from Test_Time_travel
+
+
+---update values in table 
+
+update Test_Time_travel
+set name='sss'
+
+---timestamp=> time travel to a time just before the update was run
+select * from Test_Time_travel at(timestamp => '2020-05-15 09:28:06.132 +0000'::timestamp);
+
+--offset => time travel to 5 minutes ago
+select * from Test_Time_travel at(offset => -60*5);
+
+
+--note query id of this update
+--statement => time travel to a time just before the update query was run
+select * from Test_Time_travel before(statement => '01943d59-00c6-39f2-0000-00000679e729');
+
+
+
+
+--Cloning Historical Objects
+create table Test_Time_travel_restored_table  clone Test_Time_travel
+  at(timestamp => '2020-05-15 09:28:06.132 +0000'::timestamp);
+
+
+/*
+create schema restored_schema clone my_schema at(offset => -3600);
+create database restored_db clone my_db
+  before(statement => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726');*/
+  
+  
+ --Dropping and Restoring Objects
+ select * from Test_Time_travel_restored_table;
+
+ drop table Test_Time_travel_restored_table;
+ 
+ select * from Test_Time_travel_restored_table;
+ 
+ undrop table Test_Time_travel_restored_table;
+ 
+ select * from Test_Time_travel_restored_table;
+ 
+ /*
+ undrop schema myschema;
+
+undrop database mydatabase;
+
+ */
+
+--see table history : versions , dropped on 
+show tables history;
+
