@@ -1,0 +1,24 @@
+-- On Provider Account 
+
+--  create a new reader account for the non-snowflake user
+CREATE MANAGED ACCOUNT managed_account
+ADMIN_NAME = SFADMIN , ADMIN_PASSWORD = 'P@ssword123' ,
+TYPE = READER;
+
+--{"accountName":"NS21006","loginUrl":"https://ns21006.ap-south-1.aws.snowflakecomputing.com"}
+
+SHOW MANAGED ACCOUNTS;
+
+-- add consumer account to share
+ALTER SHARE CUSTOMER_SHARE ADD ACCOUNT=NS21006;
+
+
+
+---on Reader account (connect to reader account )
+CREATE DATABASE CUSTOMER_DATABASE FROM SHARE FM87864.CUSTOMER_SHARE;
+
+--create WH 
+CREATE WAREHOUSE VWH_NEW WITH WAREHOUSE_SIZE = 'XSMALL' WAREHOUSE_TYPE = 'STANDARD' AUTO_SUSPEND = 600 AUTO_RESUME = TRUE;
+
+select * from "CUSTOMER_DATABASE"."PUBLIC"."CUSTOMER"
+
