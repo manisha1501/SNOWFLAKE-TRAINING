@@ -1,0 +1,169 @@
+/* DDL Commands
+
+Data Definition Language (DDL) commands are used to create, manipulate, and modify objects in Snowflake, such as users, 
+virtual warehouses, databases, schemas, tables, views, columns, functions, and stored procedures.
+
+*/
+
+
+--*********************CREATE************************
+
+--CREATE ROLE
+
+create role myrole;
+
+--CREATE USER
+
+create user user1 password='abc123' default_role = myrole must_change_password = true;
+
+--CREATE WAREHOUSE
+create or replace warehouse my_wh with warehouse_size='X-LARGE';
+create or replace warehouse my_wh warehouse_size=large initially_suspended=true;
+
+
+--CREATE DATABASE
+create database mytestdb;
+
+create database mytestdb2 data_retention_time_in_days = 10;
+
+show databases like 'my%';
+
+create transient database mytransientdb;
+
+show databases like 'my%';
+
+--CREATE TABLE
+
+create table mytable (amount number);
+insert into mytable values(1);
+
+show tables like 'mytable';
+
+desc table mytable;
+
+-- WITH comment
+create table example (col1 number comment 'a column comment') comment='a table comment';
+show tables like 'example';
+desc table example;
+
+--create table as select 
+create table mytable_copy (b) as select * from mytable;
+
+desc table mytable_copy;
+
+create table mytable_copy2 as select b+1 as c from mytable_copy;
+desc table mytable_copy2;
+
+--create table...like 
+create table mytable_2 like mytable;
+
+desc table mytable_2;
+select * from mytable_2;
+
+--Create table with  multi-column clustering key
+create or replace  table mytable (date timestamp_ntz, id number, content variant) cluster by (date, id);
+show tables like 'mytable';
+
+
+
+--CREATE....CLONE
+
+create database mytestdb_clone clone mytestdb;
+
+create table mytable_clone clone mytable;
+
+select * from mytable_clone
+
+
+--CREATE VIEW 
+
+create view myview comment='Test view' as select DATE, ID from mytable;
+
+show views;
+
+create or replace secure view myview comment='Test secure view' as select DATE, ID from mytable;
+
+select * from information_schema.views where is_secure='YES';
+
+create materialized view mymv
+    comment='Test view'
+    as     select DATE, ID from mytable;
+    
+    show views;
+
+
+
+
+
+
+
+
+----**************ALTER*************************
+
+---alter session 
+alter session set lock_timeout = 3600;
+--lock timeout for statements executed in the session to 1 hour 
+alter session unset lock_timeout;
+
+
+--ALTER ROLE
+--alter role
+alter role myrole rename to role2;
+show roles
+
+--alter WH 
+alter warehouse my_wh resume;
+
+alter warehouse my_wh set warehouse_size=medium;
+
+
+-- alter DB 
+alter database if exists db1 rename to db2;
+
+-- alter table 
+
+alter table mytable rename to mytable1;
+alter table mytable1 add column a3 number not null;
+
+desc table mytable1;
+
+--ALTER VIEW 
+
+alter view myview rename to myview1;
+
+alter view myview1 set secure;
+
+
+---*************************DROP***************8888
+
+--DROP ROLE 
+drop role role2;
+
+--drop table 
+drop table if exists mytable;
+
+--DROP VIEW 
+ 
+ drop view myview1;
+ 
+ --DROP DATABASE 
+ drop database MYTESTDB;
+ 
+ drop database "MYTESTDB2";
+ 
+ drop database "MYTESTDB_CLONE";
+ 
+drop database "MYTRANSIENTDB"
+
+
+--DROP WAREHOUSE 
+drop warehouse my_wh
+
+
+----***************OTHER DLL COMMANDS 
+
+DESCRIBE 
+SHOW 
+USE 
+ 
+ 

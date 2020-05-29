@@ -1,0 +1,114 @@
+CREATE TABLE employees (FIRST_NAME STRING, LAST_NAME STRING,WORKPHONE STRING, CITY STRING, POSTAL_CODE NUMBER);
+
+insert into employees
+  values
+  ('Lysandra','Reeves','1-212-759-3751','New York',10018),
+  ('Michael','Arnett','1-650-230-8467','San Francisco',94116);
+
+
+CREATE TABLE contractors CLONE employees;	
+
+select * from contractors;
+
+--INSERT INTO 
+insert into employees(first_name, last_name, workphone, city,postal_code)
+  select
+    first_name, last_name, workphone, city,postal_code
+  from contractors where postal_code=94116
+  
+  SELECT * FROM employees;
+
+--INSERT OVERWRITE
+INSERT OVERWRITE INTO contractors
+ SELECT * FROM employees;
+
+SELECT * FROM contractors
+
+
+UPDATE contractors
+ SET CITY='DC', POSTAL_CODE=10016 WHERE POSTAL_CODE=10018;
+
+UPDATE contractors
+ SET FIRST_NAME='John', LAST_NAME='ABANU',POSTAL_CODE=94117 WHERE POSTAL_CODE=94116;
+
+UPDATE contractors
+ SET LAST_NAME='JACKSON' WHERE POSTAL_CODE=94116;
+
+
+SELECT * FROM contractors;
+
+
+
+/* MERGE
+
+Inserts, updates, and deletes values in a table based on values in a second table or a subquery. This can be useful if the second table is a change log that contains new rows (to be inserted), modified rows (to be updated), and/or marked rows (to be deleted) in the target table.
+
+The command supports semantics for handling the following cases:
+
+Values that match (for updates and deletes).
+
+Values that do not match (for inserts).*/
+
+
+
+create table target_table (id integer, description varchar);
+create table source_table (id integer, description varchar);
+
+insert into target_table (id, description) values
+    (10, 'To be updated (this is the old value)')
+    ;
+
+insert into source_table (id, description) values
+    (10, 'To be updated (this is the new value)')
+    ;
+
+insert into source_table (id, description) values
+    (9, 'To be inserted (this is the new value)')
+    ;
+
+SELECT * FROM source_table;
+SELECT * FROM target_table;
+
+
+merge into target_table using source_table 
+    on target_table.id = source_table.id
+    when matched then 
+        update set target_table.description = source_table.description
+    when not matched then 
+        insert (id, description) values (source_table.id, source_table.description);
+
+
+select * from target_table;
+
+
+--DELETE 
+
+DELETE FROM   employees 
+ where postal_code=10018;
+
+--TRUNCATE 
+
+truncate table if exists employees;
+
+
+
+/*
+Data Loading / Unloading DML
+Commands for bulk copying data into and out of Snowflake tables:
+
+COPY INTO <table> (loading/importing data)
+
+COPY INTO <location> (unloading/exporting data)
+
+
+
+File Staging Commands (for Data Loading / Unloading)
+These commands do not perform any actual DML, but are used to stage and manage files stored in Snowflake locations (named internal stages, table stages, and user stages), for the purpose of loading and unloading data:
+
+PUT
+
+GET
+
+LIST (can also be used with named external stages)
+
+REMOVE*/

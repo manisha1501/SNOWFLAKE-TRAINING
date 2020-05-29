@@ -1,0 +1,105 @@
+--***************************WH Usage
+/*WAREHOUSE_METERING_HISTORY function
+This function returns credit usage within the last 6 months.
+
+WAREHOUSE_METERING_HISTORY(
+      DATE_RANGE_START => <constant_expr>
+      [ , DATE_RANGE_END => <constant_expr> ]
+      [ , WAREHOUSE_NAME => '<string>' ] )
+      
+  */    
+
+
+select *
+from table(information_schema.warehouse_metering_history(dateadd('days',-10,current_date())));
+
+select *
+from table(information_schema.warehouse_metering_history('2020-05-12', '2020-05-13', 'DEV_WH'));
+
+
+
+/*The METERING_HISTORY view in the ACCOUNT_USAGE schema can be used to return the hourly credit usage for an account
+within the last 365 days (1 year).
+*/
+
+select * from METERING_HISTORY
+
+
+
+
+
+--******************cloud services credits
+
+--Find queries by type that consume the most cloud services credits
+select query_type, sum(credits_used_cloud_services) cs_credits, count(1) num_queries
+from query_history
+where true
+and start_time >= timestampadd(day, -1, current_timestamp)
+group by 1
+order by 2 desc
+limit 10;
+
+
+--Find queries of a given type that consume the most cloud services credits
+
+select *
+from query_history
+where true
+  and start_time >= timestampadd(day, -1, current_timestamp)
+  and query_type = 'SELECT'
+order by credits_used_cloud_services desc
+limit 10;
+
+
+--Find warehouses that consume the most cloud services credits
+select warehouse_name,
+       sum(credits_used_cloud_services) credits_used_cloud_services,
+       sum(credits_used_compute) credits_used_compute,
+       sum(credits_used) credits_used
+from warehouse_metering_history
+where 
+   start_time >= timestampadd(day, -5, current_timestamp)
+group by 1
+order by 2 desc
+limit 10;
+
+
+
+
+
+
+/*---****************Database Storage Usage
+
+DATABASE_STORAGE_USAGE_HISTORY
+This function returns storage usage within the last 6 months.
+
+DATABASE_STORAGE_USAGE_HISTORY(
+      [ DATE_RANGE_START => <constant_expr> ]
+      [, DATE_RANGE_END => <constant_expr> ]
+      [, DATABASE_NAME => '<string>' ] )
+      
+      */
+
+select *
+from table(information_schema.database_storage_usage_history(dateadd('days',-10,current_date()),current_date()));
+
+/*
+STAGE_STORAGE_USAGE_HISTORY
+
+This function returns stage storage usage within the last 6 month
+Named internal stages.
+Default staging areas (for tables and users)
+
+STAGE_STORAGE_USAGE_HISTORY(
+      [ DATE_RANGE_START => <constant_expr> ]
+      [, DATE_RANGE_END => <constant_expr> ] )
+      */
+
+select *
+from table(information_schema.stage_storage_usage_history(dateadd('days',-10,current_date()),current_date()));
+
+
+
+
+
+
